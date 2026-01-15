@@ -1,0 +1,23 @@
+# Credentials
+*.cred
+credentials.json
+.env
+config.json
+
+# Reports avec données sensibles
+reports/*.csv
+reports/*.json
+reports/*.html
+
+# Logs
+*.log
+
+# Temp
+*.tmp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# VS Code
+.vscode/

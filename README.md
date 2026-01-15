@@ -1,38 +1,79 @@
 ﻿# M365 Security Audit Toolkit
-Initial repository setup.
-# M365 Security Audit Toolkit
 
-## C’est quoi ?
-Ce projet est un toolkit PowerShell pour auditer rapidement la posture de sécurité d’un tenant Microsoft 365 (MFA, connexions, permissions, groupes, etc.) et sortir des rapports lisibles.
+Toolkit PowerShell pour auditer la sécurité d'un tenant Microsoft 365.
 
-Ici deux objectifs :
-- **m’entraîner sur M365 / Entra + PowerShell**
-- **construire un vrai projet portfolio**, utile et évolutif
+Projet perso pour m'entraîner sur M365/Entra + PowerShell et construire un vrai projet portfolio utilisable.
 
-## Ce que ça audite (déjà / prévu)
-- MFA des utilisateurs (activé/désactivé, méthodes)
-- Logs de connexion (échecs, localisation, comportements suspects)
-- Délégations Exchange (FullAccess / SendAs)
-- Analyse des groupes (types, membres, groupes vides)
-- Politiques d’accès conditionnel (si dispo)
-- Export des résultats (CSV / TXT / HTML)
+## Qu'est-ce que ça fait
+
+L'idée c'est d'automatiser les audits de sécurité M365 que je ferais normalement manuellement :
+- Vérifier le statut MFA des users
+- Analyser les logs de connexion suspects
+- Checker les délégations Exchange (qui a accès à quoi)
+- Lister les groupes et leurs membres
+- Regarder les politiques d'accès conditionnel
+
+Pour l'instant c'est en développement, je construis les scripts au fur et à mesure que j'apprends.
 
 ## Prérequis
-- PowerShell 7+
-- Modules officiels :
-  - `ExchangeOnlineManagement`
-  - `Microsoft.Graph`
-- Un tenant Microsoft 365 (idéalement un **tenant de test**)
 
-## Structure du dépôt
-- `scripts/` : scripts PowerShell pour chaque audit
-- `docs/` : documentation d’installation et de fonctionnement
-- `reports/` : exemples de rapports générés
-- `modules/` : éventuels modules internes réutilisables
+- PowerShell 7+
+- Modules : `ExchangeOnlineManagement` et `Microsoft.Graph`
+- Un tenant M365 (de test)
 
 ## Installation
-Cloner le repo :
-
-```bash
-git clone https://github.com/<ton_user>/M365-Security-Audit-Toolkit.git
+```Bash
+git clone https://github.com/Mus1shi/M365-Security-Audit-Toolkit.git
 cd M365-Security-Audit-Toolkit
+```
+
+Installer les modules nécessaires :
+```Powershell
+Install-Module ExchangeOnlineManagement -Scope CurrentUser
+Install-Module Microsoft.Graph -Scope CurrentUser
+```
+
+## Structure
+```
+scripts/    → Scripts d'audit individuels
+docs/       → Documentation et guides
+reports/    → Exemples de rapports générés
+modules/    → Fonctions réutilisables
+tests/      → Tests des scripts
+```
+
+## Utilisation
+
+Pour l'instant les scripts sont en développement. L'idée sera de les lancer via un script principal ou de les lancer individuellement.
+
+Exemple futur :
+```powershell
+.\scripts\Get-MFAStatus.ps1
+# Génère un rapport CSV avec le statut MFA de tous les users
+```
+
+## Roadmap
+
+- [x] Setup du repo
+- [ ] Script audit MFA
+- [ ] Script analyse des connexions
+- [ ] Script permissions Exchange
+- [ ] Rapport global en HTML
+- [ ] Maybe un dashboard si j'ai le temps
+
+## Notes
+
+- C'est un projet d'apprentissage, donc le code va évoluer
+- Les rapports peuvent contenir des données sensibles, attention
+- Pas destiné à la prod pour l'instant, plutôt pour du lab/learning
+
+## Licence
+
+MIT - fais ce que tu veux avec
+
+## Contact
+
+Tommy Vlassiou  
+[LinkedIn](https://www.linkedin.com/in/tommy-vlassiou) | [GitHub](https://github.com/Mus1shi)
+
+---
