@@ -1,6 +1,5 @@
 <#
-.SYNOPSYS
-
+.Synopsis
 Vérifie le statut MFA des users M365
 
 .DESCRIPTION
