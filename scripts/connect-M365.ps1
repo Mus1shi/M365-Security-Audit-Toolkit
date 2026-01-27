@@ -5,8 +5,7 @@ Description : This is a tools, to help people/businesses for autiding.
 
 Author : Tommy Vlassiou
 Date Start : 27/01/2026
-Date End : ?
-Version : 1.0
+Version : 1.0 – Day 1 Foundation
 #>
 
  param(
@@ -49,4 +48,36 @@ return [PSCustomObject]@{
     }
 }
 
+
+function Write-AuditLog {
+    param (
+        [Parameter(Mandatory)]
+        [string]$Message,
+        [string]$Level = "INFO"
+    )
+
+$TimeStamp = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
+$FormattedMessage = "[$($TimeStamp)] [$($Level.ToUpper())] $($Message)"
+$LevelUpper = $Level.ToUpper()
+
+
+if ($LevelUpper -eq "INFO") {
+    $color = "Cyan"
+}
+elseif ($LevelUpper -eq "SUCCESS") {
+    $color = "Green"
+} 
+elseif($LevelUpper -eq "WARNING"){
+    $color = "Yellow"
+}
+elseif($LevelUpper -eq "ERROR"){
+    $color = "Red"
+}
+else {
+    $color = "Magenta"
+}
+
+Write-Host "$($FormattedMessage)" -ForegroundColor $color
+
+}
 
