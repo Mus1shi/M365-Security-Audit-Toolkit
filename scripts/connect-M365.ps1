@@ -40,11 +40,11 @@ New-Item -type Directory "$AuditPath"
 
 return [PSCustomObject]@{
     Feature = "AuditFolder"
-    Status = " OK "
+    Status = "OK"
     FindingsCount = 0
     OutputFiles = @($AuditPath)
     Errors = @()
-    Notes = " Audit folder created at $AuditPath "
+    Notes = "Audit folder created at $AuditPath"
     }
 }
 
@@ -106,18 +106,27 @@ return [PSCustomObject]@{
 }
 }
 
-function MainScript {
-    param (
-    )
-    
+
+$auditResults = @()
 
     try {
+        Write-AuditLog "Starting M365 audit..."
+        $auditFolderResult = New-AuditFolder 
+        $auditResults += $auditFolderResult
+        $currentAuditFolder = $auditFolderResult.OutputFiles[0]
+        $prerequisiteResult = Test-Prerequisites
+        $auditResults += $prerequisiteResult
         
+        if ($prerequisiteResult.status -eq "FAILED") {
+            Write-AuditLog "Prerequisites check failed" 
+            throw "Prerequisites check failed"
+        }
     }
-    catch {
-        
+    catch { 
+        Write-AuditLog "... $($_.Exception.Message) ..." "ERROR"
+        exit 1
     }
 
-    
+    $statutGlobal =
 
-}
+
