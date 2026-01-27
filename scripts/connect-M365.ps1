@@ -40,11 +40,11 @@ New-Item -type Directory "$AuditPath"
 
 return [PSCustomObject]@{
     Feature = "AuditFolder"
-    Status = "OK"
+    Status = " OK "
     FindingsCount = 0
     OutputFiles = @($AuditPath)
     Errors = @()
-    Notes = "Audit folder created at $AuditPath"
+    Notes = " Audit folder created at $AuditPath "
     }
 }
 
@@ -81,3 +81,43 @@ Write-Host "$($FormattedMessage)" -ForegroundColor $color
 
 }
 
+function Test-Prerequisites {
+    param (
+        )
+Write-AuditLog "Checking prerequisites..."
+$psMajorVersion = $PSVersionTable.PSVersion.Major
+$errors = @()
+$outputFiles = @()
+
+if ($psMajorVersion -lt 5) {
+    $errors += "PowerShell $($psMajorVersion) detected. Version 5 or higher is required."
+    $status = "FAILED"
+}else{
+    $status = "OK"
+}
+
+return [PSCustomObject]@{
+    Feature = "Prerequisites"
+    Status = $status
+    FindingsCount = $errors.Count
+    OutputFiles =	$outputFiles
+    Errors = $errors
+    Notes =	"Powershell major version $($psMajorVersion) detected."
+}
+}
+
+function MainScript {
+    param (
+    )
+    
+
+    try {
+        
+    }
+    catch {
+        
+    }
+
+    
+
+}
