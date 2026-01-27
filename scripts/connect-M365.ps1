@@ -127,6 +127,13 @@ $auditResults = @()
         exit 1
     }
 
-    $statutGlobal =
+if ( ($auditResults | Where-Object { $_.Status -eq "FAILED" }).Count -gt 0 ) {
+    $statusGlobal = "FAILED"
+}
+else {
+    $statusGlobal = "COMPLETED"
+}
+
+$totalFindings = $auditResults
 
 
