@@ -5,7 +5,7 @@ Description : This is a tools, to help people/businesses for autiding.
 
 Author : Tommy Vlassiou
 Date Start : 27/01/2026
-Version : 1.0 – Day 1 Foundation
+Version : 1.0 - Day 1 Foundation
 #>
 
  param(
@@ -32,11 +32,11 @@ function New-AuditFolder {
 $TimeStamp = (Get-Date).ToString("yyyyMMdd_HHmm")
 
 if (! (Test-Path $OutputPath)) {
-    New-Item -type Directory $OutputPath
+    New-Item -ItemType Directory -Path $OutputPath | Out-Null
 }
 
 $AuditPath = (Join-Path -Path "$OutputPath" -ChildPath "$TimeStamp")
-New-Item -type Directory "$AuditPath"
+    New-Item -ItemType Directory -Path $AuditPath  | Out-Null
 
 return [PSCustomObject]@{
     Feature = "AuditFolder"
@@ -116,9 +116,11 @@ $auditResults = @()
         $currentAuditFolder = $auditFolderResult.OutputFiles[0]
         $prerequisiteResult = Test-Prerequisites
         $auditResults += $prerequisiteResult
+        $csvPath = Join-Path -Path $currentAuditFolder -ChildPath "prerequisites_check.csv"
+        $prerequisiteResult | Export-Csv -Path $csvPath -NoTypeInformation
         
         if ($prerequisiteResult.status -eq "FAILED") {
-            Write-AuditLog "Prerequisites check failed" 
+            Write-AuditLog "Prerequisites check failed" "ERROR"
             throw "Prerequisites check failed"
         }
     }
@@ -138,11 +140,6 @@ else {
 $totalFindings = ($auditResults | Measure-Object -Property FindingsCount -Sum).Sum
 $totalErrors = ($auditResults | ForEach-Object { $_.Errors.Count } | Measure-Object -Sum).Sum
 
-$statusGlobal
-$totalFindings
-$totalErrors
-$auditResults | Format-List *
-
 $finalReport = [PSCustomObject]@{
     
     Tool = "M365 Audit Toolkit"
@@ -155,8 +152,6 @@ $finalReport = [PSCustomObject]@{
     AuditFolder = $currentAuditFolder
     Notes = "Day 1 foundation run"
 }
-
-$finalReport
 
 if ($statusGlobal -eq "COMPLETED") {
     Write-AuditLog "Audit completed successfully" "SUCCESS"
