@@ -107,6 +107,57 @@ return [PSCustomObject]@{
 }
 
 
+function Check-RequiredModules {
+    param ()
+    #Vérifie si les modules existent sur la machine
+    $RequiredModules = @("Microsoft.Graph", "ExchangeOnlineManagement")
+    $ResultsModules = @()
+    
+    foreach ($Module in $RequiredModules) {
+         $ModuleInfo = Get-Module -ListAvailable -Name $Module -ErrorAction SilentlyContinue
+         $IsInstalled = [bool]$ModuleInfo 
+         $Status = if ($IsInstalled -eq $true) { "OK" } else { "FAILED" }
+         $Notes = if ($IsInstalled -eq $true) { "Module available" } else { "Module not found in PSModulePath" }
+         $ModuleResults = [PSCustomObject]@{
+            Module = $Module
+            Installed = $IsInstalled
+            Status = $Status
+            Notes = $Notes
+         }
+          $ResultsModules += $ModuleResults
+ }
+ return $ResultsModules
+}
+
+function Import-RequiredModules {
+    param ( )
+    #Tente de charger les modules
+    $RequiredModules = @("Microsoft.Graph", "ExchangeOnlineManagement")
+    $ResultsModules = @()
+
+foreach($Module in $RequiredModules){
+
+    try {
+        Import-Module -Name $Module -ErrorAction Stop
+        $Status = "OK"
+        $Notes = "Module imported successfully"
+    }
+    catch {
+        $Status = "FAILED"
+        $Notes = "Import FAILED for $Module"
+    }
+$ModuleResults = [PSCustomObject]@{
+            Module = $Module
+            Status = $Status
+            Notes = $Notes
+         }
+          $ResultsModules += $ModuleResults
+
+}
+return $ResultsModules
+}
+
+
 $auditResults = @()
 
     try {
