@@ -123,9 +123,10 @@ $auditResults = @()
         }
     }
     catch { 
-        Write-AuditLog "... $($_.Exception.Message) ..." "ERROR"
+        Write-AuditLog "Unhandled error: $($_.Exception.Message) " "ERROR"
         exit 1
     }
+
 
 if ( ($auditResults | Where-Object { $_.Status -eq "FAILED" }).Count -gt 0 ) {
     $statusGlobal = "FAILED"
@@ -134,6 +135,34 @@ else {
     $statusGlobal = "COMPLETED"
 }
 
-$totalFindings = $auditResults
+$totalFindings = ($auditResults | Measure-Object -Property FindingsCount -Sum).Sum
+$totalErrors = ($auditResults | ForEach-Object { $_.Errors.Count } | Measure-Object -Sum).Sum
 
+$statusGlobal
+$totalFindings
+$totalErrors
+$auditResults | Format-List *
 
+$finalReport = [PSCustomObject]@{
+    
+    Tool = "M365 Audit Toolkit"
+    Version = "1.0 - Day 1 Foundation"
+    Status = $statusGlobal
+    Date = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
+    TotalFeatures = $auditResults.Count
+    TotalFindings = $totalFindings
+    TotalErrors = $totalErrors
+    AuditFolder = $currentAuditFolder
+    Notes = "Day 1 foundation run"
+}
+
+$finalReport
+
+if ($statusGlobal -eq "COMPLETED") {
+    Write-AuditLog "Audit completed successfully" "SUCCESS"
+}
+else {
+    Write-AuditLog "Audit finished with errors" "ERROR"
+}
+
+$finalReport | Format-List
