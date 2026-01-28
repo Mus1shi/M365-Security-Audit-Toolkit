@@ -157,6 +157,38 @@ $ModuleResults = [PSCustomObject]@{
 return $ResultsModules
 }
 
+function Connect-M365Services {
+    param ()
+    #retourne un objet de statut de connexion
+
+    $Status = "FAILED"
+    $Notes = ""
+
+try {
+    Connect-MgGraph -Scopes "User.Read.All", "Group.ReadWrite.All"
+    $Status = "OK"
+    $Notes = "Connected to Microsoft Graph"
+}
+catch {
+    $Notes = "Graph connection failed: $($_.Exception.Message)"
+ }
+ $ConnectionResult = [PSCustomObject]@{
+     Service = "Microsoft Graph"
+     Status = $Status
+     Notes = $Notes
+ }
+ return $ConnectionResult
+}
+
+
+try {
+    Get-MgUser -Top 5
+    $GraphTestStatus = "OK"
+}
+catch {
+    $GraphTestStatus = "FAILED"
+    Write-AuditLog "Graph Connection failed : $($_.Exception.Message)" 
+}
 
 $auditResults = @()
 
@@ -169,6 +201,10 @@ $auditResults = @()
         $auditResults += $prerequisiteResult
         $csvPath = Join-Path -Path $currentAuditFolder -ChildPath "prerequisites_check.csv"
         $prerequisiteResult | Export-Csv -Path $csvPath -NoTypeInformation
+        $auditResults += (Check-RequiredModules)
+        $auditResults += (Import-RequiredModules)
+        $auditResults += (Connect-M365Services)
+        $auditResults += 
         
         if ($prerequisiteResult.status -eq "FAILED") {
             Write-AuditLog "Prerequisites check failed" "ERROR"
@@ -210,5 +246,11 @@ if ($statusGlobal -eq "COMPLETED") {
 else {
     Write-AuditLog "Audit finished with errors" "ERROR"
 }
+
+Check-RequiredModules | Export-Csv -Path (Join-Path $currentAuditFolder "modules_check.csv") -NoTypeInformation
+Import-RequiredModules | Export-Csv -Path (Join-Path $currentAuditFolder "modules_import.csv") -NoTypeInformation
+Connect-M365Services | Export-Csv -Path (Join-Path $currentAuditFolder "graph_connection.csv") -NoTypeInformation
+[PSCustomObject]@{ Test="GraphQueryTop5"; Status=$GraphTestStatus } | Export-Csv -Path (Join-Path $currentAuditFolder "graph_test.csv") -NoTypeInformation
+
 
 $finalReport | Format-List
